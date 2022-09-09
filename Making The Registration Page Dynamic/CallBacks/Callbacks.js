@@ -8,15 +8,17 @@ function getPost() {
   }, 1000);
 }
 
-function createPost(post, callback) {
+function createPost(post, callback = undefined) {
   setTimeout(() => {
     posts.push(post);
-    callback();
+    if (callback) callback();
   }, 2000);
 }
 
-createPost({ title: "Post Third" }, getPost);
+createPost({ title: "Post Third" });
 
-// function create4thPost(callback) {
-//   createPost({ title: "Post Fourth" }, getPost);
-// }
+function create4thPost(callback) {
+  createPost({ title: "Post Four" }, getPost);
+}
+
+create4thPost(createPost);
