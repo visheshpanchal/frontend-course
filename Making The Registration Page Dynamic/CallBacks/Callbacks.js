@@ -1,9 +1,17 @@
-const posts = [{ title: "Post One" }, { title: "Post Two" }];
+const posts = [
+  { title: "Post One", createdAt: Date.now() },
+  { title: "Post Two", createdAt: Date.now() },
+];
 
 function getPost() {
   setTimeout(() => {
     posts.forEach((item, index) => {
-      console.log("My", item.title);
+      console.log(
+        "My",
+        item.title,
+        `${(Date.now() - item.createdAt) / 1000}s`,
+        "ago"
+      );
     });
   }, 1000);
 }
@@ -15,10 +23,13 @@ function createPost(post, callback = undefined) {
   }, 2000);
 }
 
-createPost({ title: "Post Third" });
+createPost({ title: "Post Third", createdAt: Date.now() });
 
 function create4thPost(callback) {
-  createPost({ title: "Post Four" }, getPost);
+  setTimeout(() => {
+    posts.push({ title: "Post Four", createdAt: Date.now() });
+    getPost();
+  }, 2000);
 }
 
 create4thPost(createPost);
