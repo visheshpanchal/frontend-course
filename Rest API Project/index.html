@@ -12,11 +12,11 @@
     <form id="my-form">
       <div>
         <label for="">Amount</label>
-        <input type="number" id="amount" default="0" />
+        <input type="number" id="amount" required="required" />
       </div>
       <div>
         <label for="">Description</label>
-        <input type="text" id="description" default="" />
+        <input type="text" id="description" required="required" />
       </div>
       <div>
         <label for="">Category</label>
@@ -26,7 +26,7 @@
           <option value="food">Food</option>
         </select>
       </div>
-      <button type="submit" name="add">Add Expense</button>
+      <button type="submit" name="add">Add</button>
     </form>
 
     <table id="my-table"></table>

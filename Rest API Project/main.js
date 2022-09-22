@@ -1,9 +1,9 @@
 let getForm = document.getElementById("my-form");
 let urlLink =
-  "https://crudcrud.com/api/9e8eb103d5314767aff7051b1205c7f8/store/";
+  "https://crudcrud.com/api/ca0f2a6faa724eaba0fec5a1f3dad46f/store/";
 let btn = getForm.lastElementChild;
 
-btn.addEventListener("click", store);
+getForm.addEventListener("submit", store);
 
 // Store Item
 function store(e) {
@@ -15,56 +15,34 @@ function store(e) {
 
   let catValue = category.selectedIndex;
 
-  if (amount !== "0" && description !== "") {
-    let attr = btn.getAttribute("name");
-    if (attr !== "add" && attr !== undefined) {
-      let link = urlLink + attr;
-      let obj = {};
-      obj["amount"] = amount;
-      obj["description"] = description;
-      obj["category"] = catValue;
-      putDataOnCloud(link, obj)
-        .then(function (res) {
-          console.log(res);
-          if (res.status === 200 || res.status === 204) {
-            location.reload();
-          }
-        })
-        .catch(function (err) {
-          console.log(err);
-        });
-    } else {
-      let obj = {};
-      obj["amount"] = amount;
-      obj["description"] = description;
-      obj["category"] = catValue;
-      postDataOnCloud(urlLink, obj)
-        .then(function (res) {
-          if (res.status === 201) {
-            location.reload();
-          }
-        })
-        .catch(function (err) {
-          console.log(err);
-        });
-    }
+  let attr = btn.getAttribute("name");
+  console.log(attr);
+  if (attr !== "add" && attr !== undefined) {
+    let link = urlLink + attr;
+    let obj = {};
+    obj["amount"] = amount;
+    obj["description"] = description;
+    obj["category"] = catValue;
+    putDataOnCloud(link, obj);
+  } else {
+    let obj = {};
+    obj["amount"] = amount;
+    obj["description"] = description;
+    obj["category"] = catValue;
+    postDataOnCloud(urlLink, obj);
   }
 }
 
 // Displaying Stored Item
 let table = document.getElementById("my-table");
 
-function getDataFromCloud(urlLink) {
-  return axios({
-    method: "get",
-    url: urlLink,
-  });
-}
-// This is same we need to change only data
-let storage = getDataFromCloud(urlLink);
+async function storage(urlLink) {
+  try {
+    let res = await axios({
+      method: "get",
+      url: urlLink,
+    });
 
-storage
-  .then(function (res) {
     let jsonData = res.data;
     if (jsonData.length > 0) {
       let tableHead = document.createElement("thead");
@@ -90,60 +68,79 @@ storage
     } else {
       table.style.display = "none";
     }
-  })
-  .catch(function (err) {
-    console.log(err);
-  });
+  } catch (e) {
+    console.log(e);
+  }
+}
+// After DOM Loaded we fetch data from crud crud
+window.addEventListener("DOMContentLoaded", (event) => {
+  storage(urlLink);
+});
 
 // Delete Item By Click
-function deleteData(ele) {
+async function deleteData(ele) {
   let number = ele.name;
   let _urlLink = urlLink + number;
-  axios({ method: "delete", url: _urlLink })
-    .then(function (res) {
-      if (res.status === 200) {
-        location.reload();
-      }
-    })
-    .catch(function (err) {
-      console.log(err);
-    });
+
+  try {
+    let res = await axios({ method: "delete", url: _urlLink });
+    if (res.status === 200) {
+      location.reload();
+    }
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 // Post Method
 axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.headers.post["Accept"] = "*/*";
-function postDataOnCloud(urlLink, dataItems) {
-  return axios({
-    method: "post",
-    url: urlLink,
-    data: dataItems,
-  });
+async function postDataOnCloud(urlLink, dataItems) {
+  try {
+    let res = await axios({
+      method: "post",
+      url: urlLink,
+      data: dataItems,
+    });
+    if (res.status === 201) {
+      location.reload();
+    }
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 // Put Method
 
-function editData(ele) {
+async function editData(ele) {
   let number = ele.name;
   let amount = document.getElementById("amount");
   let description = document.getElementById("description");
   let category = document.getElementById("category");
 
   let _urlLink = urlLink;
-  let getData = axios({ method: "get", url: _urlLink + number });
+  try {
+    let getData = await axios({ method: "get", url: _urlLink + number });
 
-  getData.then(function (res) {
-    let data = res.data;
-
+    let data = getData.data;
     amount.value = data["amount"];
     description.value = data["description"];
     category.selectedIndex = data["category"];
 
     btn.setAttribute("name", number);
     btn.textContent = "Update";
-  });
+  } catch (err) {
+    console.log(err);
+  }
 }
 
-function putDataOnCloud(urlLink, _data) {
-  return axios({ method: "put", url: urlLink, data: _data });
+async function putDataOnCloud(urlLink, _data) {
+  try {
+    let res = await axios({ method: "put", url: urlLink, data: _data });
+    if (res.status === 200 || res.status === 204) {
+      location.reload();
+    }
+  } catch (err) {
+    console.log(err);
+  }
 }
